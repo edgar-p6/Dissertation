@@ -1,5 +1,5 @@
 # Dissertation
-Code used in the elaboration of the dissertation for the Master in Economics at FEP
+Code used in the elaboration of the dissertation with the title "Can Early Warning Indicators Explain the Depth and Severity of Sovereign Debt Crises?" for the Master in Economics at FEP, by Edgar Pereira, supervised by Professor Manuel Duarte Rocha
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 
