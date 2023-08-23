@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Aug 18 22:00:55 2023
+Created on Tue Jun 20 22:00:55 2023
 
 @author: EdgarPereira
 """
@@ -67,3 +67,6 @@ df_data = df_data.sort_values(by = ['Country', 'Year'], ascending = [True, True]
 df_data['TRes'] = df_temp1['Tres']
 # Assign missing values as NaN
 df_data = df_data.replace('..',np.NaN)
+
+#Export to the Excel file
+df_data.to_excel("data.xlsx")
