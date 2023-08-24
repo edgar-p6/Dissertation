@@ -39,6 +39,9 @@ df_crisis['length_db'] = df_crisis['End'] - df_crisis['Start']
 df_crisis['Crisis'] = df_crisis['Start'].astype(str) + '-' + df_crisis['End'].astype(str)
 df_crisis = df_crisis.set_index(['Country','Crisis'])
 
+#Export df_crisis to excel
+df_crisis.to_excel('df_crisis.xlsx')
+
 # Final result of this script:
     # df_data (indexed by country and year): database to add data on the variables for all countries and years, to be used to build the main database
     # df_crisis (indexed by country and crisis episode and with some information about the crisis episodes): main database of crisis episodes to be studied
