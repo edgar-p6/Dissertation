@@ -61,10 +61,25 @@ for i in range(0,len(df_bank)):
         df_bank = df_bank.drop(i)
 #Keep only the necessary columns
 df_bank = df_bank[['Country', 'BVX Year', 'BVX list: UNION OF TWO TYPES']]
-df_bank = df_bank.rename(columns={'BVX Year': 'Year', 'BVX list: UNION OF TWO TYPES': 'Banking Crisis Dummy'})
+df_bank = df_bank.rename(columns={'BVX Year': 'Year', 'BVX list: UNION OF TWO TYPES': 'Banking Crisis'})
+
+#Rearrange df_data so that the countries not present in the banking dataset have missing values, while the others have the dummy as 0 or 1
+df_data['Banking Crisis Dummy'] = '..'
+bank_country_list = df_bank['Country'].tolist()
+bank_country_list = list(dict.fromkeys(bank_country_list))
+for i in range(0,len(df_data)):
+    if df_data['Country'].iloc[i] in bank_country_list:
+        df_data['Banking Crisis Dummy'].iloc[i] = 0
 
 #Merge the databse into df_data based on the common country name and year
 df_data = pd.merge(df_data, df_bank, on=['Country', 'Year'], how="left")
+
+#Rearrange df_data and drop the unnecessary column
+for i in range(0,len(df_data)):
+    if (df_data['Banking Crisis'].iloc[i] == 1):
+        df_data['Banking Crisis Dummy'].iloc[i] = 1
+df_data = df_data.drop('Banking Crisis', axis=1)
+df_data = df_data.replace('..',np.NaN)
 
 #Export to the Excel file
 df_data.to_excel("data.xlsx")
