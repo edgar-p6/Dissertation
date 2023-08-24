@@ -16,3 +16,7 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
  **dissertation4.py:** reads, organizes and adds to the database variables retrieved from the IMF Fiscal Monitor
 
  **dissertation5.py:** reads, organizes and adds to the database variables on commodity prices (oil and food), global variables (GDP growth in USA and China, real interest rate in USA), and banking crisis dummy
+
+ **dissertation6.py:** reads, organizes and adds to the database data on GDP growth, retrieved from The World Bank
+
+ **dissertation7.py:** merges the data retrieved into the main database, for the years with crisis episodes (1 year antecipation)
