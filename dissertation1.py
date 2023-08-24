@@ -37,7 +37,6 @@ df_crisis = df_crisis.drop(['NoCrisis', 'CrisisEpisode'], axis=1)
 df_crisis[['Start', 'End']] = df_crisis['Crisis'].str.split('-', expand=True).astype(int)
 df_crisis['length_db'] = df_crisis['End'] - df_crisis['Start']
 df_crisis['Crisis'] = df_crisis['Start'].astype(str) + '-' + df_crisis['End'].astype(str)
-df_crisis = df_crisis.set_index(['Country','Crisis'])
 
 #Export df_crisis to excel
 df_crisis.to_excel('df_crisis.xlsx')
