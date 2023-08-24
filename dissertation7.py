@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 03 13:46:52 2023
+Created on Tue Aug 08 21:13:45 2023
 
 @author: EdgarPereira
 """
@@ -8,53 +8,52 @@ Created on Thu Aug 03 13:46:52 2023
 import pandas as pd
 import numpy as np
 
-#Import the main database (df_crisis) from excel
-df_crisis = pd.read_excel('df_crisis.xlsx')
-df_crisis = df_crisis.drop('Unnamed: 0', axis=1)
-
-#Add a variable with the number of past defaults in the period
-df_crisis['# of past defaults'] = df_crisis.groupby('Country').cumcount()
-#Add a dummy variable for the past defaults (0 for the first default in the period, 1 for the others)
-df_crisis['Dummy for past default'] = 0
-for i in range(0,len(df_crisis)):
-    if df_crisis['# of past defaults'].iloc[i] > 0:
-        df_crisis['Dummy for past default'].iloc[i] = 1
-        
-##############################################################################
-
-#Import the database with the variables
+#Read the data file previously made
 df_data = pd.read_excel('data.xlsx')
 df_data = df_data.drop('Unnamed: 0', axis=1)
+#Create a list of the countries in the dataframe
+country_list = df_data['Country'].tolist()
+country_list = list(dict.fromkeys(country_list))
 
-df_crisis = df_crisis.rename({'Start': 'Year'}, axis=1)
+#Read the file with new data from the World Bank
+df_gdp_new = pd.read_excel('GDP.xlsx')
+#Sort the dataframe by variable
+df_gdp_new = df_gdp_new.sort_values(by = ['Series Name', 'Country Name'], ignore_index=True)
+#Delete the rows of countries not present in the list
+for i in range(0,len(df_gdp_new)):
+    if df_gdp_new['Country Name'][i] in country_list:
+        pass
+    else:
+        df_gdp_new = df_gdp_new.drop(i)
+#Save the name of the variables in a list
+var_list = df_gdp_new['Series Name'].tolist()
+var_list = list(dict.fromkeys(var_list))
+#Create new coluns in df_data for the new variables
+df_data = df_data.reindex(columns=list(df_data.columns)+var_list, fill_value=0)
 
-# Create an empty dataframe (temporary)
-merged_df = pd.DataFrame()
-# Iterate through each row in the df_crisis dataframe and merge data from df_data, with 1 year of antecipation
-for _, row in df_crisis.iterrows():
-    temp_df = df_data[(df_data['Country'] == row['Country']) & (df_data['Year'] == row['Year'] - 1)].copy()
-    temp_df['Year'] = row['Year']  
-    merged_df = pd.concat([merged_df, temp_df])
+#Split the dataframe by variable, creating a dataframe for each of the two variables
+df_split = np.array_split(df_gdp_new, 2)
+
+#Rearrange data to fit the df_data framework
+var = []
+for i in range(0,len(df_split)):
+    var.insert(i, df_split[i]['Series Name'].iloc[0])
+    df_split[i] = df_split[i].transpose()
+    df_split[i].columns = df_split[i].iloc[0]
+    df_split[i] = df_split[i].iloc[4:47, :]
+    df_split[i] = pd.melt(df_split[i], value_name=var[i])
     
-#Merge it back into df_crisis
-df_crisis1 = df_crisis.merge(merged_df, on=['Country', 'Year'], how='left')
+#Insert data into df_data
+df_data['GDP (constant 2015 US$)'] = df_split[0]['GDP (constant 2015 US$)']
+df_data['GDP per capita (constant 2015 US$)'] = df_split[1]['GDP per capita (constant 2015 US$)']
 
-df_crisis1 = df_crisis1.rename({'Year': 'Start'}, axis=1)
+#Assign missing values as NaN
+df_data = df_data.replace('..',np.NaN)
 
-# Create an empty dataframe (temporary)
-merged_df2 = pd.DataFrame()
-# Iterate through each row in the df_crisis dataframe and merge data from df_data, with 2 years of antecipation
-for _, row in df_crisis.iterrows():
-    temp_df2 = df_data[(df_data['Country'] == row['Country']) & (df_data['Year'] == row['Year'] - 2)].copy()
-    temp_df2['Year'] = row['Year']  
-    merged_df2 = pd.concat([merged_df2, temp_df2])
-    
-#Merge it back into df_crisis
-df_crisis2 = df_crisis.merge(merged_df2, on=['Country', 'Year'], how='left')
+#Delete previously retrieved GDP and GDP per capita data
+df_data = df_data.drop(['GDP', 'GDP per capita, PPP (constant 2017 international $)'], axis=1)
 
-df_crisis2 = df_crisis2.rename({'Year': 'Start'}, axis=1)
+#Export to the Excel file
+df_data.to_excel("data.xlsx")
 
-#Export both datasets to Excel
-df_crisis1.to_excel('df_crisis1.xlsx')
-df_crisis2.to_excel('df_crisis2.xlsx')
 

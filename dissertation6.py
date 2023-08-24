@@ -25,7 +25,7 @@ for i in range(0,len(df_gdp)):
     else:
         df_gdp = df_gdp.drop(i)
         
-#Rearrange reserves data to fit the df_data framework
+#Rearrange data to fit the df_data framework
 df_gdp = df_gdp.iloc[:,2:47].transpose()
 df_gdp.columns = df_gdp.iloc[0]
 df_gdp = df_gdp.iloc[2:45, :]
