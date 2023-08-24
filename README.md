@@ -19,4 +19,4 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation6.py:** reads, organizes and adds to the database data on GDP growth, retrieved from The World Bank
 
- **dissertation7.py:** merges the data retrieved into the main database, for the years with crisis episodes (1 year antecipation)
+ **dissertation7.py:** adds data on default history in the period (dummy for past default and number of past defaults), and merges all the data retrieved into the main database, for the years with crisis episodes, creating two datasets (1 year antecipation vs 2 years antecipation
