@@ -22,3 +22,16 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 **dissertation7.py:** reads, organizes and adds to the database data on GDP and GDP per capita (constant 2015 US$), removing previously retrieved GDP and GDP per capita data (constant 2017 international $), due to having less missing values
 
  **dissertation8.py:** adds data on default history in the period (dummy for past default and number of past defaults), and merges all the data retrieved into the main database, for the years with crisis episodes, creating two datasets (1 year antecipation vs 2 years antecipation)
+
+ **dissertation9.py:** applies Hodrick-Prescott filter to GDP data (creating variables trendGDP and cycleGDP), and creates the dependent variable "Sum_GDPcycle, calculating the cumulative difference between actual GDP and trend GDP for each crisis episode, during the length of the crisis, with the length being as in the original Moreno Badia et al (2022) dataset
+
+ ## Guide to the data files
+
+ **data.xlsx:** auxiliary dataset, used to create the main datasets, with data on the used variables for the countries from 1980-2022
+
+**df_crisis1.xlsx:** main dataset to be directly used in the empirical analysis, with data of the crisis episodes, with independent variables having a 1-year antecipation
+
+**df_crisis2.xlsx:** main dataset to be directly used in the empirical analysis, with data of the crisis episodes, with independent variables having a 2-year antecipation
+
+
+
