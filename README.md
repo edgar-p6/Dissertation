@@ -29,6 +29,8 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation10.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDP_1Y.pdf"**
 
+ **dissertation11.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDP_2Y.pdf"**
+
  ## Guide to the data files
 
  **data.xlsx:** auxiliary dataset, used to create the main datasets, with data on the used variables for the countries from 1980-2022
