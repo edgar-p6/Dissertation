@@ -25,6 +25,10 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation9.py:** applies Hodrick-Prescott filter to GDP data (creating variables trendGDP and cycleGDP), and creates the dependent variable "Sum_GDPcycle, calculating the cumulative difference between actual GDP and trend GDP for each crisis episode, during the length of the crisis, with the length being as in the original Moreno Badia et al (2022) dataset
 
+ ### Code used for the regressions
+
+ **dissertation10.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDP_1Y.pdf"**
+
  ## Guide to the data files
 
  **data.xlsx:** auxiliary dataset, used to create the main datasets, with data on the used variables for the countries from 1980-2022
