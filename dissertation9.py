@@ -35,11 +35,12 @@ for i in range(0,len(df_dep_split)):
     df_dep_split[i]['GDPtrend'] = trend
     df_dep_split[i]['GDPcycle'] = cycle
     
-#Join the dataframes back together
+#Join the dataframes back together and create a column for the percentual difference between actual GDP and trend GDP
 column_list = df_dep_split[0].columns.tolist()
 df_dep1 = pd.DataFrame(np.concatenate(df_dep_split))
 df_dep1 = df_dep1.set_axis(column_list, axis=1)
 df_dep1[['GDP', 'GDPgrowth', 'GDPtrend', 'GDPcycle']] = df_dep1[['GDP', 'GDPgrowth', 'GDPtrend', 'GDPcycle']].apply(pd.to_numeric)    
+df_dep1['%GDPdiff'] = (df_dep1['GDPcycle']/df_dep1['GDPtrend'])*100
 df_dep1 = df_dep1.drop(['GDP', 'GDPgrowth'], axis=1)
 
 #Merge it into the original dataframe, to have all the years (with or without value)
@@ -60,12 +61,12 @@ merged_df = pd.DataFrame()
 # Iterate through each row in df_crisis1 and calculate the sum of the GDPcycle during the crisis episodes
 for _, row in df_crisis1.iterrows():
     temp_df = df_dep[(df_dep['Country'] == row['Country']) & (df_dep['Year'] >= row['Start']) & (df_dep['Year'] <= row['End'])].copy()
-    sum_GDPcycle = temp_df['GDPcycle'].sum()
+    cumulative_diff = temp_df['%GDPdiff'].sum()
     merged_df = pd.concat([merged_df, pd.DataFrame({
         'Country': [row['Country']],
         'Start': [row['Start']],
         'End': [row['End']],
-        'Sum_GDPcycle': [sum_GDPcycle],
+        'Cumulative_diff': [cumulative_diff],
     })])
 
 # Merge the original dataset df_crisis1 with the merged data
@@ -77,20 +78,28 @@ merged_df2 = pd.DataFrame()
 # Iterate through each row in df_crisis2 and calculate the sum of the GDPcycle during the crisis episodes
 for _, row in df_crisis2.iterrows():
     temp_df = df_dep[(df_dep['Country'] == row['Country']) & (df_dep['Year'] >= row['Start']) & (df_dep['Year'] <= row['End'])].copy()
-    sum_GDPcycle = temp_df['GDPcycle'].sum()
+    cumulative_diff = temp_df['%GDPdiff'].sum()
     merged_df2 = pd.concat([merged_df2, pd.DataFrame({
         'Country': [row['Country']],
         'Start': [row['Start']],
         'End': [row['End']],
-        'Sum_GDPcycle': [sum_GDPcycle],
+        'Cumulative_diff': [cumulative_diff],
     })])
 
 # Merge the original dataset df_crisis2 with the merged data
 df_crisis2 = df_crisis2.merge(merged_df2, on=['Country', 'Start', 'End'], how='left')
 
 #Assign 0 in the sum_GDPcycle variable as NaN
-df_crisis1['Sum_GDPcycle'] = df_crisis1['Sum_GDPcycle'].replace(0,np.NaN)
-df_crisis2['Sum_GDPcycle'] = df_crisis2['Sum_GDPcycle'].replace(0,np.NaN)
+df_crisis1['Cumulative_diff'] = df_crisis1['Cumulative_diff'].replace(0,np.NaN)
+df_crisis2['Cumulative_diff'] = df_crisis2['Cumulative_diff'].replace(0,np.NaN)
+
+#Correct the column of the length_db, previously calculated
+df_crisis1['length_db'] = (df_crisis1['End'] - df_crisis1['Start']) + 1
+df_crisis2['length_db'] = (df_crisis2['End'] - df_crisis2['Start']) + 1
+
+#Compute and add a column with the mean difference (between actual and trend GDP) per year of crisis
+df_crisis1['Mean_diff'] = df_crisis1['Cumulative_diff']/df_crisis1['length_db']
+df_crisis2['Mean_diff'] = df_crisis2['Cumulative_diff']/df_crisis2['length_db']
 
 #Export both datasets to Excel
 df_crisis1.to_excel('df_crisis1.xlsx')
