@@ -27,9 +27,11 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  ### Code used for the regressions
 
- **dissertation10.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_1Y.pdf"**
+ **dissertation10.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_1Y.pdf"**
 
- **dissertation11.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_2Y.pdf"**
+ **dissertation11.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_2Y.pdf"**
+
+ **dissertation12.py:** performs the bivariate OLS regressions on the length of the crisis with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_length_1Y.pdf"**
 
  ## Guide to the data files
 
