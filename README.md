@@ -23,13 +23,13 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation8.py:** adds data on default history in the period (dummy for past default and number of past defaults), and merges all the data retrieved into the main database, for the years with crisis episodes, creating two datasets (1 year antecipation vs 2 years antecipation)
 
- **dissertation9.py:** applies Hodrick-Prescott filter to GDP data (creating variables trendGDP and cycleGDP), and creates the dependent variable "Sum_GDPcycle, calculating the cumulative difference between actual GDP and trend GDP for each crisis episode, during the length of the crisis, with the length being as in the original Moreno Badia et al (2022) dataset
+ **dissertation9.py:** applies Hodrick-Prescott filter to GDP data (creating variables trendGDP and cycleGDP), and computes the cumulative difference between actual GDP and trend GDP for each crisis episode (dependent variable "Cumulative_diff"), during the length of the crisis, with the length being as in the original Moreno Badia et al (2022) dataset, computing as well the mean difference per year of crisis, by dividing this variable by the length of the crisis
 
  ### Code used for the regressions
 
- **dissertation10.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDP_1Y.pdf"**
+ **dissertation10.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 1-year antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_1Y.pdf"**
 
- **dissertation11.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDP_2Y.pdf"**
+ **dissertation11.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed) and the Rainbow test for linearity. Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_2Y.pdf"**
 
  ## Guide to the data files
 
