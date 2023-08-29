@@ -39,6 +39,10 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation15.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP during the crisis with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPcumulative_2Y.pdf"**
 
+### Code used for graphs and figures
+
+**graph1.py:** Figure 1, comparing actual GDP with GDP trend for four countries, used in section 3.1.2.
+
  ## Guide to the data files
 
  **data.xlsx:** auxiliary dataset, used to create the main datasets, with data on the used variables for the countries from 1980-2022
