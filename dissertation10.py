@@ -1,103 +1,110 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Aug 15 19:52:52 2023
+Created on Wed Aug 09 09:57:21 2023
 
-@author: EdgarPereira
+@author: Sony Vaio
 """
 
 import pandas as pd
 import numpy as np
-import re
 import statsmodels.api as sm
-import statsmodels.stats.diagnostic as diag
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
 
-#Import the crisis dataset
+#Read data from excel
+df_data = pd.read_excel('data.xlsx')
+df_data = df_data.drop('Unnamed: 0', axis=1)
+
+#Keep only GDP data
+df_dep = pd.DataFrame()
+df_dep['Country'] = df_data['Country']
+df_dep['Year'] = df_data['Year']
+df_dep['GDP'] = df_data['GDP (constant 2015 US$)']
+df_dep['GDPgrowth'] = df_data['GDP growth (annual %)']
+
+#Split the data by country, having one dataframe per country
+df_dep_split = np.array_split(df_dep, 144)
+#Delete missing values in GDP data
+for i in range(0,len(df_dep_split)):
+    df_dep_split[i] = df_dep_split[i].dropna(subset=['GDP'])
+
+#Delete Venezuela since it doesn't have any GDP data
+del df_dep_split[139]
+
+#Apply Hodrick-Prescott filter to GDP data to extract the trend (for each country)
+for i in range(0,len(df_dep_split)):
+    cycle, trend = sm.tsa.filters.hpfilter(df_dep_split[i].GDP, lamb=6.25)
+    df_dep_split[i]['GDPtrend'] = trend
+    df_dep_split[i]['GDPcycle'] = cycle
+    
+#Join the dataframes back together and create a column for the percentual difference between actual GDP and trend GDP
+column_list = df_dep_split[0].columns.tolist()
+df_dep1 = pd.DataFrame(np.concatenate(df_dep_split))
+df_dep1 = df_dep1.set_axis(column_list, axis=1)
+df_dep1[['GDP', 'GDPgrowth', 'GDPtrend', 'GDPcycle']] = df_dep1[['GDP', 'GDPgrowth', 'GDPtrend', 'GDPcycle']].apply(pd.to_numeric)    
+df_dep1['%GDPdiff'] = (df_dep1['GDPcycle']/df_dep1['GDPtrend'])*100
+df_dep1 = df_dep1.drop(['GDP', 'GDPgrowth'], axis=1)
+
+#Merge it into the original dataframe, to have all the years (with or without value)
+df_dep = pd.merge(df_dep, df_dep1, on=['Country', 'Year'], how="left")
+
+#Export to Excel
+df_dep.to_excel('GDP_HP.xlsx')
+
+#Import main datasets (df_crisis)
 df_crisis1 = pd.read_excel('df_crisis1.xlsx')
 df_crisis1 = df_crisis1.drop('Unnamed: 0', axis=1)
+df_crisis2 = pd.read_excel('df_crisis2.xlsx')
+df_crisis2 = df_crisis2.drop('Unnamed: 0', axis=1)
 
-# Create a function to remove invalid characters from variables names
-def sanitize_variable_name(name):
-    invalid_characters = r'[\\/:*?"<>|]'
-    sanitized_name = re.sub(invalid_characters, '', name)
-    return sanitized_name
+# Create an empty dataframe 
+merged_df = pd.DataFrame()
 
-sanitized_name_mapping = {var: sanitize_variable_name(var) for var in df_crisis1.columns}
+# Iterate through each row in df_crisis1 and calculate the sum of the GDPcycle during the crisis episodes
+for _, row in df_crisis1.iterrows():
+    temp_df = df_dep[(df_dep['Country'] == row['Country']) & (df_dep['Year'] >= row['Start']) & (df_dep['Year'] <= row['End'])].copy()
+    cumulative_diff = temp_df['%GDPdiff'].sum()
+    merged_df = pd.concat([merged_df, pd.DataFrame({
+        'Country': [row['Country']],
+        'Start': [row['Start']],
+        'End': [row['End']],
+        'Cumulative_diff': [cumulative_diff],
+    })])
 
-# Extract and define the dependent variable and independent variables
-dependent_variable = 'Mean_diff'
-independent_variables = df_crisis1.columns.difference([dependent_variable, 'Country', 'Crisis', 'Start', 'End', 'length_db', 'Cumulative_diff'])
+# Merge the original dataset df_crisis1 with the merged data
+df_crisis1 = df_crisis1.merge(merged_df, on=['Country', 'Start', 'End'], how='left')
 
-# Define the independent variables for which to apply the natural logarithm
-variables_to_log = ['Debt service on external debt, total (TDS, current US$)',
-                    'GDP (constant 2015 US$)',
-                    'GDP per capita (constant 2015 US$)',
-                    'Net official aid received (current US$)',
-                    'Official exchange rate (LCU per US$, period average)',
-                    'TRes',
-                    'Use of IMF credit (DOD, current US$)']
+# Create an empty dataframe 
+merged_df2 = pd.DataFrame()
 
-#Small constant to add to the variables that will be log-transformed, since some of them have a few values equal to 0
-log_offset = 1e-25
+# Iterate through each row in df_crisis2 and calculate the sum of the GDPcycle during the crisis episodes
+for _, row in df_crisis2.iterrows():
+    temp_df = df_dep[(df_dep['Country'] == row['Country']) & (df_dep['Year'] >= row['Start']) & (df_dep['Year'] <= row['End'])].copy()
+    cumulative_diff = temp_df['%GDPdiff'].sum()
+    merged_df2 = pd.concat([merged_df2, pd.DataFrame({
+        'Country': [row['Country']],
+        'Start': [row['Start']],
+        'End': [row['End']],
+        'Cumulative_diff': [cumulative_diff],
+    })])
 
-# Remove an outlier identified in one of the independent variables
-df_crisis1.loc[df_crisis1['Short-term debt (% of total reserves)'].idxmax(), 'Short-term debt (% of total reserves)'] = np.nan
+# Merge the original dataset df_crisis2 with the merged data
+df_crisis2 = df_crisis2.merge(merged_df2, on=['Country', 'Start', 'End'], how='left')
 
-# Create a PDF file to save results
-pdf_filename = 'bivariate_regression_results_GDPmean_1Y.pdf'
+#Assign 0 in the sum_GDPcycle variable as NaN
+df_crisis1['Cumulative_diff'] = df_crisis1['Cumulative_diff'].replace(0,np.NaN)
+df_crisis2['Cumulative_diff'] = df_crisis2['Cumulative_diff'].replace(0,np.NaN)
 
-# Perform bivariate regressions and save to PDF
-with PdfPages(pdf_filename) as pdf:
-    for ind_var in independent_variables:
-        # Drop rows with missing values for the current pair of variables
-        subset_df = df_crisis1[[dependent_variable, ind_var]].dropna()
-        
-        X = sm.add_constant(subset_df[ind_var])  # Add the intercept
-        # Apply natural logarithm with offset to the specific independent variables
-        if ind_var in variables_to_log:
-            subset_df['ln_' + ind_var] = np.log(subset_df[ind_var] + log_offset)
-            X = sm.add_constant(subset_df['ln_' + ind_var])
-        
-        y = subset_df[dependent_variable]
-        
-        model = sm.OLS(y, X).fit()
-        
-        # White test for heteroskedasticity
-        white_test = diag.het_white(model.resid, exog=model.model.exog)
-        
-        # Use a robust estimator for the regressions where heteroskedasticity was found through the White test performed
-        if white_test[1] < 0.1:  # Using 0.1 as the threshold, you can adjust this as needed
-            model_robust = sm.OLS(y, X).fit(cov_type='HC3')
-            summary = model_robust.summary()
-            new_white_test = diag.het_white(model_robust.resid, exog=model_robust.model.exog)
-        else:
-            summary = model.summary()
-            new_white_test = white_test
-        
-        # Save the summary as a text file
-        sanitized_name = sanitized_name_mapping.get(ind_var, sanitize_variable_name(ind_var))
-        summary_filename = f'{sanitized_name}_summary.txt'
-        with open(summary_filename, 'w') as summary_file:
-            summary_file.write(summary.as_text())
-            summary_file.write('\nWhite Test Results:\n')
-            summary_file.write(f'LM Statistic: {new_white_test[0]}\n')
-            summary_file.write(f'LM P-Value: {new_white_test[1]}\n')
-            summary_file.write(f'F Statistic: {new_white_test[2]}\n')
-            summary_file.write(f'F P-Value: {new_white_test[3]}\n')
-        
-        # Create a figure and axis for the PDF plot
-        fig, ax = plt.subplots(figsize=(8, 10))
-        
-        # Add a text annotation to the plot
-        ax.text(0.1, 0.9, 'Regression Summary:', fontsize=12)
-        ax.text(0.1, 0.88, summary.as_text(), fontsize=10, va='top', ha='left', linespacing=1.5)
-        ax.text(0.1, 0.2, 'White Test Results:', fontsize=12)
-        ax.text(0.1, 0.17, f'LM Statistic: {new_white_test[0]}\nLM P-Value: {new_white_test[1]}\nF Statistic: {new_white_test[2]}\nF P-Value: {new_white_test[3]}', fontsize=10, va='top', ha='left', linespacing=1.5)
-        ax.axis('off')
-        ax.axis('off')
-        
-        pdf.savefig(fig, bbox_inches='tight')
-        plt.close()
+#Correct the column of the length_db, previously calculated
+df_crisis1['length_db'] = (df_crisis1['End'] - df_crisis1['Start']) + 1
+df_crisis2['length_db'] = (df_crisis2['End'] - df_crisis2['Start']) + 1
 
-print('Regression results saved to bivariate_regression_results_GDPmean_1Y.pdf')
+#Compute and add a column with the mean difference (between actual and trend GDP) per year of crisis
+df_crisis1['Mean_diff'] = df_crisis1['Cumulative_diff']/df_crisis1['length_db']
+df_crisis2['Mean_diff'] = df_crisis2['Cumulative_diff']/df_crisis2['length_db']
+
+#Change some columns names for more clarity
+df_crisis1 = df_crisis1.rename({'CA': 'Current Account balance (% of GDP)', 'PV:GE': 'Government Effectiveness', 'TRes': 'Total reserves (including gold, current US$)'}, axis=1)
+df_crisis2 = df_crisis2.rename({'CA': 'Current Account balance (% of GDP)', 'PV:GE': 'Government Effectiveness', 'TRes': 'Total reserves (including gold, current US$)'}, axis=1)
+
+#Export both datasets to Excel
+df_crisis1.to_excel('df_crisis1.xlsx')
+df_crisis2.to_excel('df_crisis2.xlsx')

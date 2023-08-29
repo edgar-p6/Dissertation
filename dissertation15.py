@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Aug 25 23:54:35 2023
+Created on Fri Aug 25 23:47:36 2023
 
 @author: EdgarPereira
 """
@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 #Import the crisis dataset
-df_crisis2 = pd.read_excel('df_crisis2.xlsx')
-df_crisis2 = df_crisis2.drop('Unnamed: 0', axis=1)
+df_crisis1 = pd.read_excel('df_crisis1.xlsx')
+df_crisis1 = df_crisis1.drop('Unnamed: 0', axis=1)
 
 # Create a function to remove invalid characters from variables names
 def sanitize_variable_name(name):
@@ -23,11 +23,11 @@ def sanitize_variable_name(name):
     sanitized_name = re.sub(invalid_characters, '', name)
     return sanitized_name
 
-sanitized_name_mapping = {var: sanitize_variable_name(var) for var in df_crisis2.columns}
+sanitized_name_mapping = {var: sanitize_variable_name(var) for var in df_crisis1.columns}
 
 # Extract and define the dependent variable and independent variables
 dependent_variable = 'Cumulative_diff'
-independent_variables = df_crisis2.columns.difference([dependent_variable, 'Country', 'Crisis', 'Start', 'End', 'Mean_diff', 'length_db'])
+independent_variables = df_crisis1.columns.difference([dependent_variable, 'Country', 'Crisis', 'Start', 'End', 'Mean_diff', 'length_db'])
 
 # Define the independent variables for which to apply the natural logarithm
 variables_to_log = ['Debt service on external debt, total (TDS, current US$)',
@@ -42,16 +42,16 @@ variables_to_log = ['Debt service on external debt, total (TDS, current US$)',
 log_offset = 1e-25
 
 # Remove an outlier identified in one of the independent variables
-df_crisis2.loc[df_crisis2['Short-term debt (% of total reserves)'].idxmax(), 'Short-term debt (% of total reserves)'] = np.nan
+df_crisis1.loc[df_crisis1['Short-term debt (% of total reserves)'].idxmax(), 'Short-term debt (% of total reserves)'] = np.nan
 
 # Create a PDF file to save results
-pdf_filename = 'bivariate_regression_results_GDPcumulative_2Y.pdf'
+pdf_filename = 'bivariate_regression_results_GDPcumulative_1Y.pdf'
 
 # Perform bivariate regressions and save to PDF
 with PdfPages(pdf_filename) as pdf:
     for ind_var in independent_variables:
         # Drop rows with missing values for the current pair of variables
-        subset_df = df_crisis2[[dependent_variable, ind_var]].dropna()
+        subset_df = df_crisis1[[dependent_variable, ind_var]].dropna()
         
         X = sm.add_constant(subset_df[ind_var])  # Add the intercept
         # Apply natural logarithm with offset to the specific independent variables
@@ -100,4 +100,4 @@ with PdfPages(pdf_filename) as pdf:
         pdf.savefig(fig, bbox_inches='tight')
         plt.close()
 
-print('Regression results saved to bivariate_regression_results_GDPcumulative_2Y.pdf')
+print('Regression results saved to bivariate_regression_results_GDPcumulative_1Y.pdf')
