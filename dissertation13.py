@@ -35,7 +35,7 @@ variables_to_log = ['Debt service on external debt, total (TDS, current US$)',
                     'GDP per capita (constant 2015 US$)',
                     'Net official aid received (current US$)',
                     'Official exchange rate (LCU per US$, period average)',
-                    'TRes',
+                    'Total reserves (including gold, current US$)',
                     'Use of IMF credit (DOD, current US$)']
 
 #Small constant to add to the variables that will be log-transformed, since some of them have a few values equal to 0
