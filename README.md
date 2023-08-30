@@ -41,6 +41,18 @@ Code used in the elaboration of the dissertation with the title "Can Early Warni
 
  **dissertation16.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP during the crisis with 2-years antecipation in the independent variables, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPcumulative_2Y.pdf"**
 
+ **dissertation17.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 1-year antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_1Y_control.pdf"**
+
+ **dissertation18.py:** performs the bivariate OLS regressions on the mean difference between actual GDP and trendGDP per year of crisis with 2-years antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPmean_2Y_control.pdf"**
+
+ **dissertation19.py:** performs the bivariate OLS regressions on the length of the crisis with 1-year antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_length_1Y_control.pdf"**
+
+ **dissertation20.py:** performs the bivariate OLS regressions on the length of the crisis with 2-years antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_length_2Y_control.pdf"**
+
+ **dissertation21.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP during the crisis with 1-year antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPcumulative_1Y_control.pdf"**
+
+ **dissertation22.py:** performs the bivariate OLS regressions on the cumulative difference between actual GDP and trendGDP during the crisis with 2-years antecipation in the independent variables, with GDP per capita as a control variable, performing the White test for heteroskedasticity (and correcting it when needed). Detailed results of all the regressions are in **"bivariate_regression_results_GDPcumulative_2Y_control.pdf"**
+
 ### Code used for graphs and figures
 
 **graph1.py:** Figure 1, comparing actual GDP with GDP trend for four countries, used in section 3.1.2.
